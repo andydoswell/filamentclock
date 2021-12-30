@@ -66,6 +66,11 @@ void setup() {
   pinMode(cathode_F, OUTPUT);
   pinMode(cathode_G, OUTPUT);
   pinMode(dots, OUTPUT);
+  // switch all the anodes off
+  digitalWrite (anode_HH, HIGH);
+  digitalWrite (anode_H, HIGH);
+  digitalWrite (anode_MM, HIGH);
+  digitalWrite (anode_M, HIGH);
   WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
   Serial.begin(115200);
   //WiFiManager, Local intialization. Once its business is done, there is no need to keep it around
@@ -187,37 +192,29 @@ void updateClockDisplay () {
   for (int anode = 0; anode <= 3; anode++ ) {
     switch (anode) {
       case 0:
-        digitalWrite (anode_HH, LOW);
-        digitalWrite (anode_H, HIGH);
-        digitalWrite (anode_MM, HIGH);
-        digitalWrite (anode_M, HIGH);
+        digitalWrite (anode_M, HIGH); // switch the last anode off.
         if (!extractHourTen) { //special case to suppress the leading Zero.
           setCathode(10);
         }
         else {
-          setCathode(extractHourTen);
+          setCathode(extractHourTen); // set the cathodes
         }
+        digitalWrite (anode_HH, LOW); // switch the anode on
         break;
       case 1:
-        digitalWrite (anode_HH, HIGH);
-        digitalWrite (anode_H, LOW);
-        digitalWrite (anode_MM, HIGH);
-        digitalWrite (anode_M, HIGH);
+        digitalWrite (anode_HH, HIGH); // repeat above, cycling through the anodes
         setCathode(extractHourUnit);
+        digitalWrite (anode_H, LOW);
         break;
       case 2:
-        digitalWrite (anode_HH, HIGH);
         digitalWrite (anode_H, HIGH);
-        digitalWrite (anode_MM, LOW);
-        digitalWrite (anode_M, HIGH);
         setCathode(extractMinTen);
+        digitalWrite (anode_MM, LOW);
         break;
       case 3:
-        digitalWrite (anode_HH, HIGH);
-        digitalWrite (anode_H, HIGH);
         digitalWrite (anode_MM, HIGH);
-        digitalWrite (anode_M, LOW);
         setCathode(extractMinUnit);
+        digitalWrite (anode_M, LOW);
         break;
     }
   }
