@@ -35,6 +35,7 @@ boolean PM;
 boolean tick;
 char *  ssid;
 char *  pass;
+int testdelay = 1;
 
 #define RST_PIN 32 //reset wifi credentials pin
 #define MODE_PIN 33 // high for 24hours, low for 12.
@@ -53,7 +54,7 @@ char *  pass;
 
 void setup() {
   pinMode(RST_PIN, INPUT_PULLUP); //pull this low for resetting WiFi credentials
-  pinMode(MODE_PIN, INPUT_PULLUP);
+  pinMode(MODE_PIN, INPUT_PULLUP); // pull this low for 12 hrs, open for 24h
   pinMode(anode_HH, OUTPUT); // set up the display pins
   pinMode(anode_H, OUTPUT);
   pinMode(anode_MM, OUTPUT);
@@ -81,8 +82,8 @@ void setup() {
   // then goes into a blocking loop awaiting configuration and will return success result
   bool res;
   // res = wm.autoConnect(); // auto generated AP name from chipid
-  // res = wm.autoConnect("AutoConnectAP"); // anonymous ap
-  res = wm.autoConnect("AutoConnectAP", "password"); // password protected ap
+  res = wm.autoConnect("AutoConnectAP"); // anonymous ap
+  //res = wm.autoConnect("AutoConnectAP", "password"); // password protected ap
   if (!res) {
     Serial.println("Failed to connect");
   }
@@ -91,15 +92,16 @@ void setup() {
     Serial.println("connected... :)");
   }
   getNTP();
+  //testcathodes();
 }
 
 void loop() {
   extractLocalTime();
   if (!failFlag) {
     if (isBST()) {
-      Serial.println("Is BST added an hour");
+      //Serial.println("Is BST added an hour");
       extractHour ++;
-      if (extractHour > 32) {
+      if (extractHour > 23) {
         extractHour = 0;
       }
 
@@ -114,7 +116,7 @@ void loop() {
       getNTPTimer = random(720, 1440);
     }
     updateClockDisplay();
-    //rintLocalTime (); //uncomment this to enable serial output & debugging
+    //PrintLocalTime (); //uncomment this to enable serial output & debugging
 
   }
   else {
@@ -192,7 +194,7 @@ void updateClockDisplay () {
   for (int anode = 0; anode <= 3; anode++ ) {
     switch (anode) {
       case 0:
-        digitalWrite (anode_M, HIGH); // switch the last anode off.
+        digitalWrite (anode_M, HIGH); // switch the last anode off, so all anodes are off.
         if (!extractHourTen) { //special case to suppress the leading Zero.
           setCathode(10);
         }
@@ -217,6 +219,7 @@ void updateClockDisplay () {
         digitalWrite (anode_M, LOW);
         break;
     }
+    delay (testdelay);
   }
 }
 
@@ -264,96 +267,78 @@ boolean isBST() // this bit of code blatantly plagarised from http://my-small-pr
 int setCathode (int K) {
   switch (K) {
     case 0:
-      digitalWrite (cathode_A, LOW);
-      digitalWrite (cathode_B, LOW);
-      digitalWrite (cathode_C, LOW);
-      digitalWrite (cathode_D, LOW);
-      digitalWrite (cathode_E, LOW);
-      digitalWrite (cathode_F, LOW);
-      digitalWrite (cathode_G, HIGH);
+      digitalWrite (cathode_A, HIGH);
+      digitalWrite (cathode_B, HIGH);
+      digitalWrite (cathode_C, HIGH);
+      digitalWrite (cathode_D, HIGH);
+      digitalWrite (cathode_E, HIGH);
+      digitalWrite (cathode_F, HIGH);
+      digitalWrite (cathode_G, LOW);
       break;
     case 1:
+      digitalWrite (cathode_A, LOW);
+      digitalWrite (cathode_B, HIGH);
+      digitalWrite (cathode_C, HIGH);
+      digitalWrite (cathode_D, LOW);
+      digitalWrite (cathode_E, LOW);
+      digitalWrite (cathode_F, LOW);
+      digitalWrite (cathode_G, LOW);
+      break;
+    case 2:
+      digitalWrite (cathode_A, HIGH);
+      digitalWrite (cathode_B, HIGH);
+      digitalWrite (cathode_C, LOW);
+      digitalWrite (cathode_D, HIGH);
+      digitalWrite (cathode_E, HIGH);
+      digitalWrite (cathode_F, LOW);
+      digitalWrite (cathode_G, HIGH);
+      break;
+    case 3:
+      digitalWrite (cathode_A, HIGH);
+      digitalWrite (cathode_B, HIGH);
+      digitalWrite (cathode_C, HIGH);
+      digitalWrite (cathode_D, HIGH);
+      digitalWrite (cathode_E, LOW);
+      digitalWrite (cathode_F, LOW);
+      digitalWrite (cathode_G, HIGH);
+      break;
+    case 4:
+      digitalWrite (cathode_A, LOW);
+      digitalWrite (cathode_B, HIGH);
+      digitalWrite (cathode_C, HIGH);
+      digitalWrite (cathode_D, LOW);
+      digitalWrite (cathode_E, LOW);
+      digitalWrite (cathode_F, HIGH);
+      digitalWrite (cathode_G, HIGH);
+      break;
+    case 5:
       digitalWrite (cathode_A, HIGH);
       digitalWrite (cathode_B, LOW);
-      digitalWrite (cathode_C, LOW);
+      digitalWrite (cathode_C, HIGH);
+      digitalWrite (cathode_D, HIGH);
+      digitalWrite (cathode_E, LOW);
+      digitalWrite (cathode_F, HIGH);
+      digitalWrite (cathode_G, HIGH);
+      break;
+    case 6:
+      digitalWrite (cathode_A, HIGH);
+      digitalWrite (cathode_B, LOW);
+      digitalWrite (cathode_C, HIGH);
       digitalWrite (cathode_D, HIGH);
       digitalWrite (cathode_E, HIGH);
       digitalWrite (cathode_F, HIGH);
       digitalWrite (cathode_G, HIGH);
       break;
-    case 2:
-      digitalWrite (cathode_A, LOW);
-      digitalWrite (cathode_B, LOW);
-      digitalWrite (cathode_C, HIGH);
-      digitalWrite (cathode_D, LOW);
-      digitalWrite (cathode_E, LOW);
-      digitalWrite (cathode_F, HIGH);
-      digitalWrite (cathode_G, LOW);
-      break;
-    case 3:
-      digitalWrite (cathode_A, LOW);
-      digitalWrite (cathode_B, LOW);
-      digitalWrite (cathode_C, LOW);
-      digitalWrite (cathode_D, LOW);
-      digitalWrite (cathode_E, HIGH);
-      digitalWrite (cathode_F, HIGH);
-      digitalWrite (cathode_G, LOW);
-      break;
-    case 4:
-      digitalWrite (cathode_A, HIGH);
-      digitalWrite (cathode_B, LOW);
-      digitalWrite (cathode_C, LOW);
-      digitalWrite (cathode_D, HIGH);
-      digitalWrite (cathode_E, HIGH);
-      digitalWrite (cathode_F, LOW);
-      digitalWrite (cathode_G, LOW);
-      break;
-    case 5:
-      digitalWrite (cathode_A, LOW);
-      digitalWrite (cathode_B, HIGH);
-      digitalWrite (cathode_C, HIGH);
-      digitalWrite (cathode_D, LOW);
-      digitalWrite (cathode_E, HIGH);
-      digitalWrite (cathode_F, LOW);
-      digitalWrite (cathode_G, LOW);
-      break;
-    case 6:
-      digitalWrite (cathode_A, LOW);
-      digitalWrite (cathode_B, HIGH);
-      digitalWrite (cathode_C, LOW);
-      digitalWrite (cathode_D, LOW);
-      digitalWrite (cathode_E, LOW);
-      digitalWrite (cathode_F, LOW);
-      digitalWrite (cathode_G, LOW);
-      break;
     case 7:
-      digitalWrite (cathode_A, LOW);
-      digitalWrite (cathode_B, LOW);
-      digitalWrite (cathode_C, LOW);
-      digitalWrite (cathode_D, HIGH);
-      digitalWrite (cathode_E, HIGH);
-      digitalWrite (cathode_F, LOW);
+      digitalWrite (cathode_A, HIGH);
+      digitalWrite (cathode_B, HIGH);
+      digitalWrite (cathode_C, HIGH);
+      digitalWrite (cathode_D, LOW);
+      digitalWrite (cathode_E, LOW);
+      digitalWrite (cathode_F, HIGH);
       digitalWrite (cathode_G, LOW);
       break;
     case 8:
-      digitalWrite (cathode_A, LOW);
-      digitalWrite (cathode_B, LOW);
-      digitalWrite (cathode_C, LOW);
-      digitalWrite (cathode_D, LOW);
-      digitalWrite (cathode_E, LOW);
-      digitalWrite (cathode_F, LOW);
-      digitalWrite (cathode_G, LOW);
-      break;
-    case 9:
-      digitalWrite (cathode_A, LOW);
-      digitalWrite (cathode_B, LOW);
-      digitalWrite (cathode_C, LOW);
-      digitalWrite (cathode_D, LOW);
-      digitalWrite (cathode_E, HIGH);
-      digitalWrite (cathode_F, LOW);
-      digitalWrite (cathode_G, LOW);
-      break;
-    case 10: // This is a special case, used to suppress the tens of hours display, if it's 0.
       digitalWrite (cathode_A, HIGH);
       digitalWrite (cathode_B, HIGH);
       digitalWrite (cathode_C, HIGH);
@@ -362,5 +347,61 @@ int setCathode (int K) {
       digitalWrite (cathode_F, HIGH);
       digitalWrite (cathode_G, HIGH);
       break;
+    case 9:
+      digitalWrite (cathode_A, HIGH);
+      digitalWrite (cathode_B, HIGH);
+      digitalWrite (cathode_C, HIGH);
+      digitalWrite (cathode_D, HIGH);
+      digitalWrite (cathode_E, LOW);
+      digitalWrite (cathode_F, HIGH);
+      digitalWrite (cathode_G, HIGH);
+      break;
+    case 10: // This is a special case, used to suppress the tens of hours display, if it's 0.
+      digitalWrite (cathode_A, LOW);
+      digitalWrite (cathode_B, LOW);
+      digitalWrite (cathode_C, LOW);
+      digitalWrite (cathode_D, LOW);
+      digitalWrite (cathode_E, LOW);
+      digitalWrite (cathode_F, LOW);
+      digitalWrite (cathode_G, LOW);
+      break;
   }
+}
+
+void testcathodes () {
+  int td = 1500;
+  digitalWrite (anode_HH, LOW);
+  digitalWrite (anode_H, LOW);
+  digitalWrite (anode_MM, LOW);
+  digitalWrite (anode_M, LOW);
+  digitalWrite (cathode_A, HIGH);
+  Serial.println ("A");
+  delay (td);
+  digitalWrite (cathode_A, LOW);
+  digitalWrite (cathode_B, HIGH);
+  Serial.println ("B");
+  delay (td);
+  digitalWrite (cathode_B, LOW);
+  digitalWrite (cathode_C, HIGH);
+  Serial.println ("C");
+  delay (td);
+  digitalWrite (cathode_C, LOW);
+  digitalWrite (cathode_D, HIGH);
+  Serial.println ("D");
+  delay (td);
+  digitalWrite (cathode_D, LOW);
+  digitalWrite (cathode_E, HIGH);
+  Serial.println ("E");
+  delay (td);
+  digitalWrite (cathode_E, LOW);
+  digitalWrite (cathode_F, HIGH);
+  Serial.println ("F");
+
+  delay (td);
+  digitalWrite (cathode_F, LOW);
+  digitalWrite (cathode_G, HIGH);
+  Serial.println ("G");
+  delay(1000);
+  digitalWrite (cathode_G, LOW);
+  testcathodes();
 }
