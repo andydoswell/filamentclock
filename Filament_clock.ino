@@ -31,7 +31,6 @@ unsigned long getNTPTimer = 2;
 int oldMins;
 int oldSecs;
 boolean failFlag = true;
-boolean PM;
 boolean tick;
 char *  ssid;
 char *  pass;
@@ -50,7 +49,7 @@ int testdelay = 1;
 #define cathode_E 4
 #define cathode_F 2
 #define cathode_G 15
-#define dots 35
+#define dots 25
 
 void setup() {
   pinMode(RST_PIN, INPUT_PULLUP); //pull this low for resetting WiFi credentials
@@ -67,6 +66,7 @@ void setup() {
   pinMode(cathode_F, OUTPUT);
   pinMode(cathode_G, OUTPUT);
   pinMode(dots, OUTPUT);
+  digitalWrite (dots,HIGH);
   // switch all the anodes off
   digitalWrite (anode_HH, HIGH);
   digitalWrite (anode_H, HIGH);
